@@ -2,8 +2,9 @@
 .env
 .env.local
 .env.*.local
+.envrc
 
-# Python Backend
+# Python Backend Cache & Packages
 __pycache__/
 *.py[cod]
 *$py.class
@@ -36,8 +37,10 @@ instance/
 .coverage
 htmlcov/
 .mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
-# Node Frontend
+# Node Frontend Modules & Builds
 node_modules/
 /dist
 /build
@@ -48,7 +51,7 @@ node_modules/
 .yarn-integrity
 .yarn/
 
-# IDEs & System
+# IDEs & System Settings
 .vscode/
 .idea/
 *.suo
