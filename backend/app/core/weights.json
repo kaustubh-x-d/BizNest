@@ -1,0 +1,52 @@
+{
+  "cafe": {
+    "weights": {
+      "demand": 0.35,
+      "competition": 0.25,
+      "accessibility": 0.20,
+      "feasibility": 0.20
+    },
+    "description": "High dependence on foot traffic from students and young professionals.",
+    "demand_amenities": ["school", "university", "college"]
+  },
+  "bakery": {
+    "weights": {
+      "demand": 0.30,
+      "competition": 0.25,
+      "accessibility": 0.20,
+      "feasibility": 0.25
+    },
+    "description": "Thrives near residential communities, schools, and shopping markets.",
+    "demand_amenities": ["school", "residential"]
+  },
+  "pharmacy": {
+    "weights": {
+      "demand": 0.40,
+      "competition": 0.20,
+      "accessibility": 0.20,
+      "feasibility": 0.20
+    },
+    "description": "Critical dependency on proximity to healthcare facilities and hospital density.",
+    "demand_amenities": ["hospital", "clinic"]
+  },
+  "gym": {
+    "weights": {
+      "demand": 0.30,
+      "competition": 0.25,
+      "accessibility": 0.25,
+      "feasibility": 0.20
+    },
+    "description": "Relies on residential neighborhood density and availability of parking spots.",
+    "demand_amenities": ["residential", "parking"]
+  },
+  "kirana": {
+    "weights": {
+      "demand": 0.45,
+      "competition": 0.20,
+      "accessibility": 0.15,
+      "feasibility": 0.20
+    },
+    "description": "Serves daily residential community needs, highly sensitive to dense housing areas.",
+    "demand_amenities": ["residential"]
+  }
+}
