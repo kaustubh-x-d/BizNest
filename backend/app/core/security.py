@@ -40,7 +40,9 @@ def create_refresh_token(
     return encoded_jwt
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    # Truncate to 72 characters to satisfy bcrypt length limit in python-bcrypt 4.1.0+
+    return pwd_context.verify(plain_password[:72], hashed_password)
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    # Truncate to 72 characters to satisfy bcrypt length limit in python-bcrypt 4.1.0+
+    return pwd_context.hash(password[:72])
