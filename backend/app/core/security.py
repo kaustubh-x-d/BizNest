@@ -1,15 +1,8 @@
 import bcrypt
-# Monkeypatch bcrypt to resolve passlib compatibility in Python 3.12+
-if not hasattr(bcrypt, "__about__"):
-    bcrypt.__about__ = type("About", (object,), {"__version__": bcrypt.__version__})
-
 from datetime import datetime, timedelta
 from typing import Any, Union
 from jose import jwt
-from passlib.context import CryptContext
 from backend.app.core.config import settings
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 ALGORITHM = "HS256"
 
@@ -40,9 +33,26 @@ def create_refresh_token(
     return encoded_jwt
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # Truncate to 72 characters to satisfy bcrypt length limit in python-bcrypt 4.1.0+
-    return pwd_context.verify(plain_password[:72], hashed_password)
+    """
+    Verify a plain password against its hashed version using native bcrypt.
+    Bypasses passlib to resolve compatibility and length limits on Python 3.12+.
+    """
+    try:
+        # Truncate raw password bytes to 72 to strictly respect bcrypt limits
+        password_bytes = plain_password.encode("utf-8")[:72]
+        hashed_bytes = hashed_password.encode("utf-8")
+        return bcrypt.checkpw(password_bytes, hashed_bytes)
+    except Exception as e:
+        import logging
+        logging.getLogger("uvicorn.error").error(f"Bcrypt verification failed: {e}")
+        return False
 
 def get_password_hash(password: str) -> str:
-    # Truncate to 72 characters to satisfy bcrypt length limit in python-bcrypt 4.1.0+
-    return pwd_context.hash(password[:72])
+    """
+    Hash a password using native bcrypt.
+    Bypasses passlib to resolve compatibility and length limits on Python 3.12+.
+    """
+    # Truncate raw password bytes to 72 to strictly respect bcrypt limits
+    password_bytes = password.encode("utf-8")[:72]
+    hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+    return hashed.decode("utf-8")
