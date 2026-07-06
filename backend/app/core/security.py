@@ -1,3 +1,8 @@
+import bcrypt
+# Monkeypatch bcrypt to resolve passlib compatibility in Python 3.12+
+if not hasattr(bcrypt, "__about__"):
+    bcrypt.__about__ = type("About", (object,), {"__version__": bcrypt.__version__})
+
 from datetime import datetime, timedelta
 from typing import Any, Union
 from jose import jwt
