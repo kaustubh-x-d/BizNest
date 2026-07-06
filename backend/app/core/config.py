@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     def assemble_db_connection(cls, v: str, info) -> str:
         if v:
             return v
+        
+        # Check both variables in environment
+        env_uri = os.getenv("SQLALCHEMY_DATABASE_URI") or os.getenv("DATABASE_URL")
+        if env_uri:
+            # SQLAlchemy 1.4+ requires postgresql:// protocol
+            if env_uri.startswith("postgres://"):
+                env_uri = env_uri.replace("postgres://", "postgresql://", 1)
+            return env_uri
+
         data = info.data
         return f"postgresql://{data.get('POSTGRES_USER')}:{data.get('POSTGRES_PASSWORD')}@{data.get('POSTGRES_SERVER')}:{data.get('POSTGRES_PORT')}/{data.get('POSTGRES_DB')}"
 
