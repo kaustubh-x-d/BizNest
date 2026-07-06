@@ -1,13 +1,200 @@
-# BizNest Platform
-> "Predict the potential before you invest."
+# BizNest
 
-BizNest is an AI-powered Business Intelligence and Decision Support Platform that helps first-time entrepreneurs decide where to open a new business. By analyzing location parameters using geographic GIS data, demographic indices, accessibility, and competition density, BizNest calculates a mathematical **Business Potential Score** and generates rich AI recommendations.
+BizNest is an AI-assisted business intelligence platform that helps entrepreneurs evaluate potential locations before starting a business.
+
+The platform combines geospatial information, nearby business analysis, configurable business scoring, and AI-generated recommendations to support location-based business decisions.
+
+Rather than acting as another map application, BizNest is designed as a decision support tool that helps answer questions such as:
+
+- Is this a good place to open a café?
+- How competitive is this area?
+- Which nearby location offers better potential?
+- What factors reduce the viability of this location?
+- How can the business potential be improved?
+
+The current implementation focuses on a hackathon MVP while keeping the architecture modular enough for future expansion.
 
 Kanpur, Uttar Pradesh, India is the primary demo city, supplemented with real OpenStreetMap datasets.
 
 ---
 
-## 🛠️ System Architecture
+## Features
+
+### Business Potential Analysis
+
+- Business Potential Score
+- Transparent score breakdown
+- Business-specific scoring logic
+- Explainable recommendations
+
+### Business Types
+
+The current MVP supports:
+
+- Café
+- Bakery
+- Pharmacy
+- Gym
+- Kirana Store
+
+Each business type uses its own scoring configuration rather than a single universal formula.
+
+### Interactive Map
+
+- OpenStreetMap integration
+- Location search
+- Nearby business discovery
+- Competitor visualization
+- Radius-based analysis
+
+### Competition Analysis
+
+- Nearby competitors
+- Business density
+- Distance calculations
+- Category analysis
+
+### AI Recommendation Engine
+
+The recommendation engine explains:
+
+- Strengths of a location
+- Weaknesses
+- Potential risks
+- Suggested improvements
+
+The AI is intentionally **not** responsible for generating the Business Potential Score. It only interprets and explains the results produced by the scoring engine.
+
+### Business Comparison
+
+Users can compare two locations based on:
+
+- Business Potential Score
+- Market demand
+- Competition
+- Accessibility
+- Investment feasibility
+- Growth potential
+
+### Reports
+
+Generate downloadable reports containing:
+
+- Score summary
+- Business analysis
+- Recommendations
+- Comparison results
+
+---
+
+## Technology Stack
+
+### Frontend
+
+- React
+- Vite
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- React Router
+- React Query
+- Leaflet
+- Recharts
+
+### Backend
+
+- Python
+- FastAPI
+- SQLAlchemy
+- Alembic
+- JWT Authentication
+
+### Database
+
+- PostgreSQL
+- PostGIS
+
+### GIS
+
+- OpenStreetMap
+- Overpass API
+- Nominatim API
+
+### AI
+
+- OpenAI-compatible LLM
+- Prompt-based recommendation generation
+
+---
+
+## Project Structure
+
+```
+frontend/
+backend/
+database/
+docs/
+```
+
+Frontend contains the user interface.
+
+Backend contains APIs, authentication, business logic, and AI integration.
+
+Database contains migrations and models.
+
+---
+
+## Data Sources
+
+The project uses publicly available data wherever possible.
+
+Primary sources include:
+
+- OpenStreetMap
+- Overpass API
+- Nominatim
+- Government Open Data
+- Census datasets
+
+Some business metrics such as estimated footfall, commercial activity, or rental estimates are currently represented using curated demonstration data where reliable public datasets are unavailable.
+
+---
+
+## Design Philosophy
+
+A key design decision in BizNest is separating **decision logic** from **language generation**.
+
+The Business Potential Score is calculated using configurable business rules.
+
+The language model does not assign scores.
+
+Instead, it explains:
+
+- why a location received a particular score
+- what risks exist
+- how the score could potentially be improved
+
+This makes recommendations easier to understand while keeping the scoring process transparent.
+
+---
+
+## Future Improvements
+
+Potential future work includes:
+
+- Support for additional cities
+- Live traffic integration
+- Commercial real estate data
+- Revenue forecasting
+- Government scheme recommendations
+- Multi-language support
+- Franchise planning
+- Customer demographic analysis
+- Weather-aware business insights
+
+---
+
+##  System Architecture
 
 BizNest uses a decoupled **Client-Server** architecture:
 * **Frontend**: React (TypeScript) + Tailwind CSS + Recharts + Leaflet Maps.
@@ -16,7 +203,7 @@ BizNest uses a decoupled **Client-Server** architecture:
 
 ---
 
-## ⚡ Local Quickstart
+##  Local Quickstart
 
 ### Prerequisites
 * Python 3.11+
@@ -60,7 +247,7 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 
 ---
 
-## 🐳 Running with Docker Compose
+##  Running with Docker Compose
 
 To orchestrate the full stack locally (including PostgreSQL + PostGIS DB):
 1. In the root directory, create a `.env` file containing your `GEMINI_API_KEY`:
@@ -77,7 +264,7 @@ To orchestrate the full stack locally (including PostgreSQL + PostGIS DB):
 
 ---
 
-## 🚀 Cloud Deployment Guides
+##  Cloud Deployment Guides
 
 ### 1. Database (Supabase)
 1. Register on [Supabase](https://supabase.com/).
@@ -97,3 +284,37 @@ Vercel handles static Single Page App React routing via `vercel.json` configurat
 2. Import the `frontend` subfolder.
 3. Configure the environment variable `VITE_API_URL` pointing to your deployed Render FastAPI service url.
 4. Deploy!
+
+
+## Project Status
+
+Current Status:
+
+Hackathon MVP
+
+The project demonstrates the core workflow and architecture while leaving room for future improvements and production-level enhancements.
+
+---
+
+## AI Usage Disclosure
+
+AI was used extensively during the development of this project.
+
+Rather than treating AI as a code generator alone, it was used as an engineering assistant for:
+
+- exploring architectural alternatives
+- generating implementation scaffolding
+- accelerating repetitive development tasks
+- refining documentation
+- debugging
+- brainstorming product features
+
+Final implementation decisions, feature prioritization, system integration, testing, debugging, and customization were performed manually.
+
+The purpose of using AI was to increase development speed while maintaining an understanding of the system architecture and implementation.
+
+---
+
+## License
+
+This project is intended for educational and demonstration purposes.
