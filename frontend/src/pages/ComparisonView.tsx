@@ -4,8 +4,7 @@ import { api } from "../services/api";
 import {
   ArrowLeftRight, 
   MapPin, 
-  Award,
-  Building
+  Award
 } from "lucide-react";
 import { 
   BarChart, 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, PlusCircle, Settings } from "lucide-react";
+import { Mail, Lock, User, PlusCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function SignupPage() {
