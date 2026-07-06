@@ -38,6 +38,7 @@ register_error_handlers(app)
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Health"])
+@app.head("/", tags=["Health"])
 def health_check():
     """
     Service health check endpoint.
