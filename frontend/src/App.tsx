@@ -6,6 +6,7 @@ import SignupPage from "./pages/SignupPage";
 import Dashboard from "./pages/Dashboard";
 import ComparisonView from "./pages/ComparisonView";
 import SavedReports from "./pages/SavedReports";
+import Profile from "./pages/Profile";
 import './App.css'
 // Protected Route wrapper component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -58,6 +59,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SavedReports />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } 
           />

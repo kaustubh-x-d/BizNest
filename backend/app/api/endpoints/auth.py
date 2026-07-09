@@ -15,7 +15,7 @@ from backend.app.core.security import (
 )
 from backend.app.models.user import User
 from backend.app.schemas.token import Token, TokenPayload, TokenRefreshRequest
-from backend.app.schemas.user import UserCreate, UserResponse
+from backend.app.schemas.user import UserCreate, UserResponse, PasswordResetRequest
 
 router = APIRouter()
 
@@ -148,3 +148,32 @@ def refresh_token(
         ),
         "token_type": "bearer",
     }
+
+
+@router.post("/reset-password")
+def reset_password(
+    reset_data: PasswordResetRequest,
+    db: Session = Depends(deps.get_db)
+):
+    """
+    Verify identity using email and full_name, then reset password.
+    """
+    user = db.query(User).filter(User.email == reset_data.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User with this email not found."
+        )
+    
+    # Check if the full name matches (case-insensitive check)
+    if user.full_name.strip().lower() != reset_data.full_name.strip().lower():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Identity verification failed. Registered name does not match."
+        )
+        
+    user.password_hash = get_password_hash(reset_data.new_password)
+    db.add(user)
+    db.commit()
+    return {"success": True, "message": "Password reset successful."}
+

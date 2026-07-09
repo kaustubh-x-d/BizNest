@@ -18,6 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: "Map Explorer", path: "/dashboard", icon: Compass },
     { name: "Compare Locations", path: "/compare", icon: ArrowLeftRight },
     { name: "Saved Reports", path: "/reports", icon: FolderHeart },
+    { name: "My Profile", path: "/profile", icon: User },
   ];
 
   const handleLogout = () => {
