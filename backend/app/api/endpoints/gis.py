@@ -5,6 +5,18 @@ from backend.app.services.gis import GISService
 
 router = APIRouter()
 
+def validate_kanpur_coords(lat: float, lon: float):
+    """
+    Ensure the coordinates lie strictly within the Kanpur Metropolitan Area boundary.
+    """
+    min_lat, max_lat = 26.30, 26.60
+    min_lon, max_lon = 80.10, 80.50
+    if not (min_lat <= lat <= max_lat and min_lon <= lon <= max_lon):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Coordinates are outside the supported boundary of Kanpur, India (Latitude: 26.30 to 26.60, Longitude: 80.10 to 80.50)."
+        )
+
 @router.get("/geocode", response_model=List[Dict[str, Any]])
 def geocode_address(q: str = Query(..., description="Location address search query (e.g. Kanpur, Kakadeo)")):
     """
@@ -35,6 +47,8 @@ def get_competitors(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid business type. Must be one of {valid_types}"
         )
+        
+    validate_kanpur_coords(lat, lon)
     competitors = GISService.search_nearby_competitors(lat, lon, radius, business_type)
     return competitors
 
@@ -48,5 +62,6 @@ def get_amenities(
     """
     Find surrounding amenities (schools, universities, hospitals, parking, transit nodes) in a radius.
     """
+    validate_kanpur_coords(lat, lon)
     amenities = GISService.search_nearby_amenities(lat, lon, radius)
     return amenities

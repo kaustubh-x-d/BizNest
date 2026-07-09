@@ -76,8 +76,21 @@ export default function Dashboard() {
     { id: "kirana", name: "Kirana Store", icon: Store, color: "text-slate-700 bg-slate-100" }
   ];
 
+  const [geofenceError, setGeofenceError] = useState<string>("");
+
   const handleLocationSelect = useCallback((lat: number, lon: number, radius: number) => {
-    setSelectedLocation({ lat, lon, radius });
+    const minLat = 26.30, maxLat = 26.60;
+    const minLon = 80.10, maxLon = 80.50;
+    const isInside = lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
+
+    if (!isInside) {
+      setGeofenceError("Selected location is outside Kanpur! BizNest currently only supports location intelligence within Kanpur bounds.");
+      setSelectedLocation(null);
+      setScoreResult(null);
+    } else {
+      setGeofenceError("");
+      setSelectedLocation({ lat, lon, radius });
+    }
   }, []);
 
   const handleCalculateScore = async () => {
@@ -265,6 +278,13 @@ export default function Dashboard() {
                       <div>Latitude: {selectedLocation.lat.toFixed(6)}</div>
                       <div>Longitude: {selectedLocation.lon.toFixed(6)}</div>
                       <div>Target Radius: {selectedLocation.radius} meters</div>
+                    </div>
+                  ) : geofenceError ? (
+                    <div className="bg-red-50 border border-red-200 text-red-700 text-xs py-3 px-4 rounded-lg leading-relaxed flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      <div>
+                        {geofenceError}
+                      </div>
                     </div>
                   ) : (
                     <p className="text-xs text-slate-400">Drop a pin on the map to display target parameters.</p>

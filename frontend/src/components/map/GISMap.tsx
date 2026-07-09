@@ -111,6 +111,24 @@ export default function GISMap({ businessType, onLocationSelect }: GISMapProps) 
 
   // Fetch competitors and amenities for selected coordinates and radius
   const fetchGISData = useCallback(async (lat: number, lon: number, r: number) => {
+    // Check geofence bounds first
+    const minLat = 26.30, maxLat = 26.60;
+    const minLon = 80.10, maxLon = 80.50;
+    const isInside = lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
+
+    if (!isInside) {
+      setCompetitors([]);
+      setAmenities({
+        schools_colleges: [],
+        hospitals: [],
+        transit: [],
+        parking: []
+      });
+      setGisMessage("The selected location is outside the supported boundary of Kanpur, India (Latitude: 26.30 to 26.60, Longitude: 80.10 to 80.50).");
+      onLocationSelect(lat, lon, r);
+      return;
+    }
+
     setLoading(true);
     setGisMessage("");
     try {

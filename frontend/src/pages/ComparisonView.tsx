@@ -80,11 +80,27 @@ export default function ComparisonView() {
   const [latB, setLatB] = useState<number>(26.4880);
   const [lonB, setLonB] = useState<number>(80.3120);
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [result, setResult] = useState<CompareDetails | null>(null);
+  const [error, setError] = useState<string>("");
 
   const handleCompare = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Geofence bounds checking
+    const minLat = 26.30, maxLat = 26.60;
+    const minLon = 80.10, maxLon = 80.50;
+    const isInsideA = latA >= minLat && latA <= maxLat && lonA >= minLon && lonA <= maxLon;
+    const isInsideB = latB >= minLat && latB <= maxLat && lonB >= minLon && lonB <= maxLon;
+
+    if (!isInsideA) {
+      setError(`Location A (${labelA}) coordinates are outside Kanpur bounds! Please input values between Latitude: 26.30 to 26.60 and Longitude: 80.10 to 80.50.`);
+      return;
+    }
+    if (!isInsideB) {
+      setError(`Location B (${labelB}) coordinates are outside Kanpur bounds! Please input values between Latitude: 26.30 to 26.60 and Longitude: 80.10 to 80.50.`);
+      return;
+    }
+
+    setError("");
     setLoading(true);
     setResult(null);
     try {
@@ -95,7 +111,8 @@ export default function ComparisonView() {
         location_b: { lat: latB, lon: lonB, label: labelB }
       });
       setResult(response.data);
-    } catch (err) {
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Error running side-by-side comparison. Please check your coordinates.");
       console.error("Error running side-by-side comparison", err);
     } finally {
       setLoading(false);
@@ -145,7 +162,6 @@ export default function ComparisonView() {
           </p>
         </div>
 
-        {/* Configuration inputs Form */}
         <form onSubmit={handleCompare} className="bg-white border border-slate-200 rounded-xl p-5 space-y-5 shadow-sm">
           {/* User Helper Tip */}
           <div className="bg-slate-50 border border-slate-150 p-3.5 rounded-lg text-xs text-slate-600 flex items-start gap-2.5 leading-relaxed">
@@ -154,6 +170,12 @@ export default function ComparisonView() {
               Need coordinates? First, search or drop a pin on the map in the <strong>Map Explorer</strong> section. You can copy the exact <strong>latitude</strong> and <strong>longitude</strong> shown at the bottom of the map control panel and paste them below.
             </div>
           </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-xs py-2.5 px-4 rounded-lg flex items-center gap-2">
+              <span>{error}</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Category Select */}

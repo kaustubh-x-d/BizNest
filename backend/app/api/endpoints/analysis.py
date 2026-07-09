@@ -5,6 +5,18 @@ from backend.app.services.llm import RecommendationService
 
 router = APIRouter()
 
+def validate_kanpur_coords(lat: float, lon: float):
+    """
+    Ensure coordinates lie strictly within the Kanpur Metropolitan Area boundary.
+    """
+    min_lat, max_lat = 26.30, 26.60
+    min_lon, max_lon = 80.10, 80.50
+    if not (min_lat <= lat <= max_lat and min_lon <= lon <= max_lon):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Coordinates are outside the supported boundary of Kanpur, India (Latitude: 26.30 to 26.60, Longitude: 80.10 to 80.50)."
+        )
+
 @router.post("/score")
 def calculate_score(payload: ScoreRequest):
     """
@@ -17,6 +29,8 @@ def calculate_score(payload: ScoreRequest):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid business type. Must be one of {valid_types}"
         )
+        
+    validate_kanpur_coords(payload.latitude, payload.longitude)
         
     try:
         score_details = ScoreEngine.compute_potential_score(
@@ -54,6 +68,9 @@ def compare_locations(payload: CompareRequest):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid business type. Must be one of {valid_types}"
         )
+
+    validate_kanpur_coords(payload.location_a.lat, payload.location_a.lon)
+    validate_kanpur_coords(payload.location_b.lat, payload.location_b.lon)
 
     try:
         # Score Location A
@@ -127,4 +144,3 @@ def compare_locations(payload: CompareRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error comparing locations: {str(e)}"
         )
-
