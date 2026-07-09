@@ -54,5 +54,5 @@ def get_password_hash(password: str) -> str:
     """
     # Truncate raw password bytes to 72 to strictly respect bcrypt limits
     password_bytes = password.encode("utf-8")[:72]
-    hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+    hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt(rounds=8))
     return hashed.decode("utf-8")
