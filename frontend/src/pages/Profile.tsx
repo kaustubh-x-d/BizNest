@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { useAuth } from "../contexts/AuthContext";
 import { User, Mail, Lock, CheckCircle, ShieldAlert, BadgeDollarSign } from "lucide-react";
