@@ -80,6 +80,8 @@ export default function ComparisonView() {
   const [latB, setLatB] = useState<number>(26.4880);
   const [lonB, setLonB] = useState<number>(80.3120);
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<CompareDetails | null>(null);
   const [error, setError] = useState<string>("");
 
   const handleCompare = async (e: React.FormEvent) => {
@@ -360,7 +362,7 @@ export default function ComparisonView() {
                         <div>
                           <div className="font-bold text-emerald-700">Pros</div>
                           <ul className="list-disc list-inside text-slate-500 mt-1 space-y-1">
-                            {result.location_a.details.explanation.pros.slice(0, 2).map((p, i) => (
+                            {result.location_a.details.explanation.pros.slice(0, 2).map((p: string, i: number) => (
                               <li key={i}>{p}</li>
                             ))}
                           </ul>
@@ -368,7 +370,7 @@ export default function ComparisonView() {
                         <div>
                           <div className="font-bold text-red-700">Cons</div>
                           <ul className="list-disc list-inside text-slate-500 mt-1 space-y-1">
-                            {result.location_a.details.explanation.cons.slice(0, 2).map((c, i) => (
+                            {result.location_a.details.explanation.cons.slice(0, 2).map((c: string, i: number) => (
                               <li key={i}>{c}</li>
                             ))}
                           </ul>
@@ -414,7 +416,7 @@ export default function ComparisonView() {
                         <div>
                           <div className="font-bold text-emerald-700">Pros</div>
                           <ul className="list-disc list-inside text-slate-500 mt-1 space-y-1">
-                            {result.location_b.details.explanation.pros.slice(0, 2).map((p, i) => (
+                            {result.location_b.details.explanation.pros.slice(0, 2).map((p: string, i: number) => (
                               <li key={i}>{p}</li>
                             ))}
                           </ul>
@@ -422,7 +424,7 @@ export default function ComparisonView() {
                         <div>
                           <div className="font-bold text-red-700">Cons</div>
                           <ul className="list-disc list-inside text-slate-500 mt-1 space-y-1">
-                            {result.location_b.details.explanation.cons.slice(0, 2).map((c, i) => (
+                            {result.location_b.details.explanation.cons.slice(0, 2).map((c: string, i: number) => (
                               <li key={i}>{c}</li>
                             ))}
                           </ul>
