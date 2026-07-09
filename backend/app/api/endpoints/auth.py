@@ -1,8 +1,10 @@
-from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+import uuid
+from datetime import datetime, timedelta
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, EmailStr
 
 from backend.app.api import deps
 from backend.app.core.config import settings
@@ -16,13 +18,21 @@ from backend.app.core.security import (
 from backend.app.models.user import User
 from backend.app.schemas.token import Token, TokenPayload, TokenRefreshRequest
 from backend.app.schemas.user import UserCreate, UserResponse, PasswordResetRequest
+from backend.app.services.email import send_verification_email
 
 router = APIRouter()
 
+class ResendEmailRequest(BaseModel):
+    email: EmailStr
+
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def signup(user_in: UserCreate, db: Session = Depends(deps.get_db)):
+def signup(
+    user_in: UserCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(deps.get_db)
+):
     """
-    Register a new user.
+    Register a new user and queue a verification email.
     """
     # Check if user already exists
     user = db.query(User).filter(User.email == user_in.email).first()
@@ -32,15 +42,30 @@ def signup(user_in: UserCreate, db: Session = Depends(deps.get_db)):
             detail="The user with this email address already exists in the system.",
         )
         
+    token = str(uuid.uuid4())
+    expires = datetime.utcnow() + timedelta(hours=24)
+        
     db_user = User(
         email=user_in.email,
         password_hash=get_password_hash(user_in.password),
         full_name=user_in.full_name,
         budget_tier=user_in.budget_tier,
+        is_verified=False,
+        verification_token=token,
+        verification_expires=expires
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    
+    # Queue background task to send verification link
+    background_tasks.add_task(
+        send_verification_email, 
+        db_user.email, 
+        token, 
+        db_user.full_name
+    )
+    
     return db_user
 
 
@@ -55,6 +80,13 @@ def login(login_data: UserCreate, db: Session = Depends(deps.get_db)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password",
+        )
+        
+    # Block if email is not verified
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified. Please verify your email before logging in."
         )
         
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -84,6 +116,13 @@ def login_form(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password",
+        )
+        
+    # Block if email is not verified
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified. Please verify your email before logging in."
         )
         
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -173,7 +212,75 @@ def reset_password(
         )
         
     user.password_hash = get_password_hash(reset_data.new_password)
+    # Automatically verify email if they reset password successfully via this flow
+    user.is_verified = True
+    user.verification_token = None
+    user.verification_expires = None
+    
     db.add(user)
     db.commit()
     return {"success": True, "message": "Password reset successful."}
 
+
+@router.get("/verify-email")
+def verify_email(token: str, db: Session = Depends(deps.get_db)):
+    """
+    Handle email verification link check.
+    """
+    user = db.query(User).filter(User.verification_token == token).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification token."
+        )
+        
+    # Check expiry
+    if user.verification_expires and user.verification_expires < datetime.utcnow().replace(tzinfo=user.verification_expires.tzinfo):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification link has expired."
+        )
+        
+    user.is_verified = True
+    user.verification_token = None
+    user.verification_expires = None
+    db.add(user)
+    db.commit()
+    return {"success": True, "message": "Email verified successfully! You can now sign in."}
+
+
+@router.post("/resend-verification")
+def resend_verification(
+    data: ResendEmailRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(deps.get_db)
+):
+    """
+    Resend verification email to user.
+    """
+    user = db.query(User).filter(User.email == data.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User with this email not found."
+        )
+        
+    if user.is_verified:
+        return {"success": True, "message": "Email is already verified."}
+        
+    token = str(uuid.uuid4())
+    expires = datetime.utcnow() + timedelta(hours=24)
+    user.verification_token = token
+    user.verification_expires = expires
+    db.add(user)
+    db.commit()
+    
+    # Queue background task to send verification link
+    background_tasks.add_task(
+        send_verification_email, 
+        user.email, 
+        token, 
+        user.full_name
+    )
+    
+    return {"success": True, "message": "Verification link has been resent."}

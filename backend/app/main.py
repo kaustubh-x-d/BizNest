@@ -5,13 +5,27 @@ from backend.app.api.api import api_router
 from backend.app.core.config import settings
 from backend.app.core.exceptions import register_error_handlers
 
+from sqlalchemy import text
+
 try:
     from backend.app.db.session import engine
     from backend.app.db.base_class import Base
     from backend.app.models.user import User
     from backend.app.models.saved_report import SavedReport
+    
+    # Initialize base tables
     Base.metadata.create_all(bind=engine)
-    print("Database tables initialized successfully.")
+    
+    # Run manual migration patches for existing tables in Supabase
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token VARCHAR(255) NULL"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_expires TIMESTAMP WITH TIME ZONE NULL"))
+            conn.commit()
+            print("Database tables and columns verified successfully.")
+        except Exception as migration_err:
+            print(f"Warning: Column migrations check skipped/failed: {migration_err}")
 except Exception as e:
     print(f"Warning: Database initialization failed: {e}")
 

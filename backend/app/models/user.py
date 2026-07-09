@@ -31,6 +31,17 @@ class User(Base):
         String(50), 
         nullable=True
     )
+    is_verified: Mapped[bool] = mapped_column(
+        default=False
+    )
+    verification_token: Mapped[str] = mapped_column(
+        String(255), 
+        nullable=True
+    )
+    verification_expires: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), 
         default=datetime.utcnow

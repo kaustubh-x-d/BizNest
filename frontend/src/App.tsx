@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import ComparisonView from "./pages/ComparisonView";
 import SavedReports from "./pages/SavedReports";
 import Profile from "./pages/Profile";
+import VerifyEmail from "./pages/VerifyEmail";
 import './App.css'
 // Protected Route wrapper component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/verify" element={<VerifyEmail />} />
 
           {/* Secure / Dashboard Routing */}
           <Route 
