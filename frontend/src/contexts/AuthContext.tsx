@@ -1,11 +1,11 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { api } from "../services/api";
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
-  budget_tier: string | null;
+  budget_tier: string;
   created_at: string;
 }
 
@@ -13,10 +13,8 @@ interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   isAuthenticated: boolean;
-  isGuest: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, fullName: string, budgetTier?: string) => Promise<void>;
-  loginAsGuest: () => void;
   logout: () => void;
   setUser: React.Dispatch<React.SetStateAction<UserProfile | null>>;
 }
@@ -25,25 +23,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [isGuest, setIsGuest] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Hydrate user session on load
   useEffect(() => {
     async function initAuth() {
       const token = localStorage.getItem("access_token");
-      const guestFlag = localStorage.getItem("is_guest") === "true";
       
-      if (guestFlag) {
-        setIsGuest(true);
-        setUser({
-          id: "guest-uuid-12345",
-          email: "guest@biznest.com",
-          full_name: "Guest Explorer",
-          budget_tier: "medium",
-          created_at: new Date().toISOString()
-        });
-      } else if (token) {
+      if (token) {
         try {
           const response = await api.get("/users/me");
           setUser(response.data);
@@ -60,24 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const response = await api.post("/auth/login", {
-        email,
-        password,
-        // Match base structures
-        full_name: "Login User"
-      });
+      const response = await api.post("/auth/login", { email, password });
       const { access_token, refresh_token } = response.data;
       
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
-      localStorage.removeItem("is_guest");
-      setIsGuest(false);
-
-      const userProfileRes = await api.get("/users/me");
-      setUser(userProfileRes.data);
-    } catch (err) {
-      logout();
-      throw err;
+      
+      const userResponse = await api.get("/users/me");
+      setUser(userResponse.data);
     } finally {
       setLoading(false);
     }
@@ -90,31 +67,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
         full_name: fullName,
-        budget_tier: budgetTier || "medium"
+        budget_tier: budgetTier || "medium",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const loginAsGuest = () => {
-    setIsGuest(true);
-    localStorage.setItem("is_guest", "true");
-    setUser({
-      id: "guest-uuid-12345",
-      email: "guest@biznest.com",
-      full_name: "Guest Explorer",
-      budget_tier: "medium",
-      created_at: new Date().toISOString()
-    });
-  };
-
   const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    localStorage.removeItem("is_guest");
     setUser(null);
-    setIsGuest(false);
   };
 
   return (
@@ -123,10 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         loading,
         isAuthenticated: !!user,
-        isGuest,
         login,
         signup,
-        loginAsGuest,
         logout,
         setUser,
       }}

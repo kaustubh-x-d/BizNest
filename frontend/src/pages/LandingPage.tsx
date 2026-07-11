@@ -1,15 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Compass, Sparkles, ArrowRight, BarChart2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function LandingPage() {
-  const { loginAsGuest } = useAuth();
-  const navigate = useNavigate();
-
-  const handleGuest = () => {
-    loginAsGuest();
-    navigate("/dashboard");
-  };
 
   const features = [
     {
@@ -70,19 +63,18 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                onClick={handleGuest}
-                className="bg-slate-900 hover:bg-black text-white rounded-lg py-3 px-6 text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2"
-              >
-                Explore Map Explorer
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-              
               <Link
                 to="/signup"
-                className="bg-white border border-slate-200 hover:bg-slate-50 px-6 py-3 rounded-lg text-slate-700 text-xs font-bold transition-all text-center"
+                className="bg-slate-900 hover:bg-black text-white rounded-lg py-3 px-6 text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2"
               >
-                Create Free Account
+                Start Analyzing Locations
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                to="/login"
+                className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg py-3 px-6 text-xs font-bold transition-all text-center flex items-center justify-center"
+              >
+                Sign In
               </Link>
             </div>
           </div>

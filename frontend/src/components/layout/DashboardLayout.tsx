@@ -1,4 +1,4 @@
-import React from "react";
+import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeftRight, 
@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout, isGuest } = useAuth();
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -67,11 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* User Card & Logout */}
         <div className="space-y-4 pt-6 border-t border-slate-150">
-          {isGuest && (
-            <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg text-[10px] text-amber-700 leading-snug">
-              Logged in as Guest. Saved reports will be local-only.
-            </div>
-          )}
+
           <div className="flex items-center gap-3 px-2">
             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 border border-slate-200">
               <User className="w-4 h-4" />

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import GISMap from "../components/map/GISMap";
 import { useAuth } from "../contexts/AuthContext";
@@ -58,7 +58,6 @@ interface ScoreData {
 }
 
 export default function Dashboard() {
-  const { isGuest } = useAuth();
   const [businessType, setBusinessType] = useState<BusinessType>("cafe");
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number; radius: number } | null>(null);
   
@@ -116,7 +115,7 @@ export default function Dashboard() {
 
   const handleSaveReport = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedLocation || !scoreResult || !reportTitle.trim() || isGuest) return;
+    if (!selectedLocation || !scoreResult || !reportTitle.trim()) return;
     try {
       await api.post("/reports/", {
         title: reportTitle,
@@ -361,15 +360,13 @@ export default function Dashboard() {
                     <Sparkles className="w-4.5 h-4.5 text-slate-700" />
                     <h3 className="text-sm font-bold text-slate-900">Analysis & Rationale</h3>
                   </div>
-                  {!isGuest && (
-                    <button
-                      onClick={() => setSaveDialogOpen(true)}
-                      className="flex items-center gap-1.5 bg-slate-900 hover:bg-black text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm"
-                    >
-                      <Bookmark className="w-3.5 h-3.5" />
-                      Save Snapshot
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setSaveDialogOpen(true)}
+                    className="flex items-center gap-1.5 bg-slate-900 hover:bg-black text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm"
+                  >
+                    <Bookmark className="w-3.5 h-3.5" />
+                    Save Snapshot
+                  </button>
                 </div>
 
                 <p className="text-xs text-slate-650 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200">

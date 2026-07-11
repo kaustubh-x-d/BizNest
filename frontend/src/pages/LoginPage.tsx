@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, LogIn, UserCheck, ArrowLeft, KeyRound, User } from "lucide-react";
+import { Mail, Lock, LogIn, ArrowLeft, KeyRound, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
 
 export default function LoginPage() {
-  const { login, loginAsGuest } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   
   const [email, setEmail] = useState<string>("");
@@ -89,10 +89,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleGuestLogin = () => {
-    loginAsGuest();
-    navigate("/dashboard");
-  };
+
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex items-center justify-center p-6 font-sans">
@@ -265,23 +262,7 @@ export default function LoginPage() {
           </form>
         )}
 
-        {!isForgot && (
-          <>
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-slate-150"></div>
-              <span className="flex-shrink mx-4 text-[10px] text-slate-400 uppercase font-bold">Or</span>
-              <div className="flex-grow border-t border-slate-150"></div>
-            </div>
 
-            <button
-              onClick={handleGuestLogin}
-              className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-2"
-            >
-              <UserCheck className="w-4 h-4 text-slate-650" />
-              Continue in Guest Mode
-            </button>
-          </>
-        )}
 
         <p className="text-center text-xs text-slate-400">
           Don't have an account?{" "}
