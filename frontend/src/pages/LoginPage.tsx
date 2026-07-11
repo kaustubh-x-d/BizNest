@@ -19,10 +19,6 @@ export default function LoginPage() {
   const [newPassword, setNewPassword] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
 
-  // Verification Resend States
-  const [showResend, setShowResend] = useState<boolean>(false);
-  const [resendEmail, setResendEmail] = useState<string>("");
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
@@ -31,36 +27,18 @@ export default function LoginPage() {
     }
     setError("");
     setSuccessMsg("");
-    setShowResend(false);
     setLoading(true);
     try {
       await login(email, password);
       navigate("/dashboard");
     } catch (err: any) {
-      if (err.response?.status === 403) {
-        setShowResend(true);
-        setResendEmail(email.trim());
-      }
       setError(err.response?.data?.error || "Incorrect email or password.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResend = async () => {
-    setError("");
-    setSuccessMsg("");
-    setLoading(true);
-    try {
-      await api.post("/auth/resend-verification", { email: resendEmail });
-      setSuccessMsg("Verification link has been resent! Check your inbox (or server logs).");
-      setShowResend(false);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to resend verification email.");
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const handleResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,17 +97,8 @@ export default function LoginPage() {
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-xs py-2.5 px-4 rounded-lg text-left space-y-2">
-            <p>{error}</p>
-            {showResend && (
-              <button
-                type="button"
-                onClick={handleResend}
-                className="text-[10px] font-bold text-slate-800 hover:text-black block underline"
-              >
-                Resend Verification Link
-              </button>
-            )}
+          <div className="bg-red-50 border border-red-200 text-red-700 text-xs py-2.5 px-4 rounded-lg text-left">
+            {error}
           </div>
         )}
 

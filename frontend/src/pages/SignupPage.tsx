@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, PlusCircle, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -26,6 +26,9 @@ export default function SignupPage() {
     try {
       await signup(email, password, fullName, budgetTier);
       setIsRegistered(true);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2500);
     } catch (err: any) {
       setError(err.response?.data?.error || "Registration failed. Please try again.");
     } finally {
@@ -133,27 +136,16 @@ export default function SignupPage() {
             </p>
           </>
         ) : (
-          <div className="text-center py-6 space-y-6">
+          <div className="text-center py-6 space-y-4">
             <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto animate-bounce" />
             <div className="space-y-2">
-              <h2 className="text-lg font-bold text-slate-900 tracking-tight font-sans">Verify your email</h2>
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight font-sans">Account Created!</h2>
               <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
-                We've sent a verification link to <strong>{email}</strong>. 
-                Please click the link in your email to activate your account and log in.
+                Welcome to BizNest, <strong>{fullName}</strong>. Your account has been registered successfully.
               </p>
-              <div className="bg-slate-50 border border-slate-150 p-3 rounded-lg text-[10px] text-slate-450 text-left leading-normal mt-4">
-                <strong>Testing Tip:</strong> If you are running locally or don't receive the email, you can find the verification link printed directly inside the <strong>backend server logs</strong>!
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                onClick={() => navigate("/login")}
-                className="w-full bg-slate-900 hover:bg-black text-white rounded-lg py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm"
-              >
-                Go to Sign In
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <p className="text-[10px] text-slate-400">
+                Redirecting you to the sign-in page...
+              </p>
             </div>
           </div>
         )}
