@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import GISMap from "../components/map/GISMap";
-import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
 import { 
   Coffee, 

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Compass, Sparkles, ArrowRight, BarChart2 } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
 
 export default function LandingPage() {
 
