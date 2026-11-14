@@ -320,7 +320,7 @@ export default function GISMap({ businessType, onLocationSelect }: GISMapProps) 
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" // CartoDB Voyager Light map
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
           {/* Active selection marker */}
