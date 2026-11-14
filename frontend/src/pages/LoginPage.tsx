@@ -21,7 +21,8 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !password.trim()) {
       setError("Please fill in all fields.");
       return;
     }
@@ -29,10 +30,16 @@ export default function LoginPage() {
     setSuccessMsg("");
     setLoading(true);
     try {
-      await login(email, password);
+      await login(cleanEmail, password);
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.error || "Incorrect email or password.");
+      const errorMsg =
+        typeof err.response?.data?.error === "string"
+          ? err.response.data.error
+          : typeof err.response?.data?.detail === "string"
+          ? err.response.data.detail
+          : "Incorrect email or password.";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

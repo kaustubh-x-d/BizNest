@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from backend.app.api import deps
@@ -15,7 +16,7 @@ from backend.app.core.security import (
 )
 from backend.app.models.user import User
 from backend.app.schemas.token import Token, TokenPayload, TokenRefreshRequest
-from backend.app.schemas.user import UserCreate, UserResponse, PasswordResetRequest
+from backend.app.schemas.user import UserCreate, UserLogin, UserResponse, PasswordResetRequest
 from backend.app.services.email_val import EmailValidationService
 
 router = APIRouter()
@@ -28,8 +29,9 @@ def signup(
     """
     Register a new user after running robust email validations.
     """
-    # 1. Check if email already registered
-    existing_user = db.query(User).filter(User.email == user_in.email).first()
+    clean_email = user_in.email.strip().lower()
+    # 1. Check if email already registered (case-insensitive)
+    existing_user = db.query(User).filter(func.lower(User.email) == clean_email).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -37,13 +39,13 @@ def signup(
         )
         
     # 2. Run email format, disposable, and MX record validations
-    normalized_email = EmailValidationService.validate_email_address(user_in.email)
+    normalized_email = EmailValidationService.validate_email_address(clean_email)
     
     # 3. Create active user immediately (no token, no is_verified blocking)
     db_user = User(
-        email=normalized_email,
+        email=normalized_email.strip().lower(),
         password_hash=get_password_hash(user_in.password),
-        full_name=user_in.full_name,
+        full_name=user_in.full_name.strip(),
         budget_tier=user_in.budget_tier,
         is_verified=True,
     )
@@ -54,11 +56,12 @@ def signup(
 
 
 @router.post("/login", response_model=Token)
-def login(login_data: UserCreate, db: Session = Depends(deps.get_db)):
+def login(login_data: UserLogin, db: Session = Depends(deps.get_db)):
     """
     Standard JSON login API returning access & refresh tokens.
     """
-    user = db.query(User).filter(User.email == login_data.email).first()
+    clean_email = login_data.email.strip().lower()
+    user = db.query(User).filter(func.lower(User.email) == clean_email).first()
     if not user or not verify_password(login_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -87,7 +90,8 @@ def login_form(
     """
     OAuth2 compatible form login, returning access & refresh tokens.
     """
-    user = db.query(User).filter(User.email == form_data.username).first()
+    clean_username = form_data.username.strip().lower()
+    user = db.query(User).filter(func.lower(User.email) == clean_username).first()
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -166,7 +170,8 @@ def reset_password(
     """
     Verify identity using email and full_name, then reset password.
     """
-    user = db.query(User).filter(User.email == reset_data.email).first()
+    clean_email = reset_data.email.strip().lower()
+    user = db.query(User).filter(func.lower(User.email) == clean_email).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

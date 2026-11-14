@@ -28,6 +28,10 @@ class UserCreate(UserBase):
             raise ValueError("Temporary/disposable email domains are not allowed.")
         return v
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     full_name: Optional[str] = None

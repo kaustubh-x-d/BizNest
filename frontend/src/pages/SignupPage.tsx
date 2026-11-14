@@ -30,7 +30,13 @@ export default function SignupPage() {
         navigate("/login");
       }, 2500);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Registration failed. Please try again.");
+      const errorMsg =
+        typeof err.response?.data?.error === "string"
+          ? err.response.data.error
+          : typeof err.response?.data?.detail === "string"
+          ? err.response.data.detail
+          : "Registration failed. Please try again.";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
