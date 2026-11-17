@@ -1,8 +1,6 @@
 # BizNest
 
-BizNest is an AI-assisted business intelligence platform that helps entrepreneurs evaluate potential locations before starting a business.
-
-The platform combines geospatial information, nearby business analysis, configurable business scoring, and AI-generated recommendations to support location-based business decisions.
+BizNest is a vibe-coded, AI-assisted business intelligence platform that helps entrepreneurs evaluate potential locations before starting a business. Developed using AI-assisted coding and iterative refinement, the platform combines geospatial information, nearby business analysis, configurable business scoring, and AI-generated recommendations to support location-based business decisions.
 
 Rather than acting as another map application, BizNest is designed as a decision support tool that helps answer questions such as:
 
